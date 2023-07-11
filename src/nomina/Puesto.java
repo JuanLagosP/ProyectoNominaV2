@@ -1,5 +1,6 @@
 package nomina;
 
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -77,6 +78,16 @@ public class Puesto {
         registroDePuestos.add(puesto);
     }
 
+    public static void verRegistroDePuestos() {
+        for (Puesto p : registroDePuestos) {
+            System.out.printf("%s%n %s%n %s%n %s%n",
+                    "ID: " + p.getIdPuesto(),
+                    "Puesto: " + p.getNombrePuesto(),
+                    "Salario por dia: $" + p.getSalarioPorDia(),
+                    "Pago por hora extra: $" + p.getSalarioPorHoraExtra() + "\n");
+        }
+    }
+
     public void eliminarPuesto(Puesto puesto) {
         registroDePuestos.remove(puesto);
     }
@@ -118,7 +129,13 @@ public class Puesto {
         Puesto puesto;
 
         do {
-            idPuesto = new Scanner(System.in).nextInt();
+            try {
+                idPuesto = new Scanner(System.in).nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Solo se permiten caracteres numericos.");
+                new Scanner(System.in).nextLine();
+                continue;
+            }
             puesto = buscarPuestoPorID(idPuesto);
 
             if (puesto != null) {

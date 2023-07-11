@@ -1,5 +1,6 @@
 package nomina;
 
+import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.Map;
 import java.util.LinkedHashMap;
@@ -44,13 +45,13 @@ public class Empresa implements Nomina {
 
     @Override
     public void calcularNominaEmpresa() {
-        double[] nomina = new double[] {0.0, 0.0};
+        double[] nomina = new double[] {0.0, 0.0, 0.0};
 
         for (Empleado empleado : Empleado.getRegistroDeEmpleados()) {
             nomina[0] += empleado.getDiasDeTrabajo() * empleado.getPuesto().getSalarioPorDia();
             nomina[1] += empleado.getHorasExtra() * empleado.getPuesto().getSalarioPorHoraExtra();
         }
-
+        nomina[2] = nomina[0] + nomina[1];
         setNominaEmpresa(nomina);
     }
 
@@ -60,7 +61,7 @@ public class Empresa implements Nomina {
 
         String[] meses = {"Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
         "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"};
-        double[] nominaInicial = new double[] {0.0, 0.0};
+        double[] nominaInicial = new double[] {0.0, 0.0, 0.0};
 
         for (String mes : meses) {
             historialDeNomina.put(mes, nominaInicial);
@@ -91,8 +92,8 @@ public class Empresa implements Nomina {
             String mes = entradaNomina.getKey();
             double[] nomina = entradaNomina.getValue();
 
-            System.out.println("Mes: " + mes + " - Salario Total: " + nomina[0] +
-                    " - Horas Extra: " + nomina[1]);
+            System.out.println(mes + " - Salario Total: " + nomina[0] +
+                    " - Horas Extra: " + nomina[1] + " - Total: " + nomina[2]);
         }
     }
 
@@ -132,62 +133,92 @@ public class Empresa implements Nomina {
 
         do {
             Menu.menuPrincipal();
-            opcion = scanner.nextInt();
+            try {
+                opcion = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Opcion invalida. Solo se permiten caracteres numericos.");
+                scanner.nextLine();
+                continue;
+            }
 
             switch (opcion) {
                 case 1 -> {
-                    // Registro de un nuevo empleado
-                    System.out.println("Por favor, ingrese la informacion que se solicita.");
-                    System.out.println("ID: ");
-                    int id;
-                    Empleado empleado;
-                    // Verificar que el ID ingresado no corresponda al de un empleado ya registrado.
+                    int op;
                     do {
-                        id = scanner.nextInt();
-                        empleado = Empleado.buscarEmpleadoPorID(id);
+                        Menu.menuRegistro();
+                        try {
+                            op = scanner.nextInt();
+                        } catch (InputMismatchException e) {
+                            System.out.println("Opcion ivalida. Solo se permiten caracteres numericos.");
+                            scanner.nextLine();
+                            continue;
+                        }
 
-                        if (empleado != null) {
-                            System.out.println("El ID ingresado ya pertenece a un usuario. Por favor, ingrese " +
-                                    "un nuevo ID.");
+                        if (op == 1) {
+                            Empleado.verRegistroDeEmpleados();
+                        } else if (op == 2) {
+                            // Registro de un nuevo empleado
+                            System.out.println("Por favor, ingrese la informacion que se solicita.");
+                            System.out.println("ID: ");
+                            int id;
+                            Empleado empleado;
+                            // Verificar que el ID ingresado no corresponda al de un empleado ya registrado.
+                            do {
+                                try {
+                                    id = scanner.nextInt();
+                                } catch (InputMismatchException e) {
+                                    System.out.println("Solo se permiten caracteres numericos.");
+                                    scanner.nextLine();
+                                    continue;
+                                }
+                                empleado = Empleado.buscarEmpleadoPorID(id);
+
+                                if (empleado != null) {
+                                    System.out.println("El ID ingresado ya pertenece a un usuario. Por favor, ingrese " +
+                                            "un nuevo ID.");
+                                } else {
+                                    break;
+                                }
+                            } while (true);
+
+                            // Registro de nombre, apellido, domicilio, edad, etc.
+                            String[] datos = new String[3];
+                            int[] datosNumericos = new int[3];
+
+                            System.out.println("Nombre: ");
+                            scanner.nextLine();
+                            datos[0] = scanner.nextLine();
+
+                            System.out.println("Apellido: ");
+                            datos[1] = scanner.nextLine();
+
+                            System.out.println("Domicilio: ");
+                            datos[2] = scanner.nextLine();
+
+                            System.out.println("Edad: ");
+                            datosNumericos[0] = scanner.nextInt();
+
+                            System.out.println("Dias de trabajo: ");
+                            datosNumericos[1] = Empleado.checarDias();
+
+                            System.out.println("Horas extra: ");
+                            datosNumericos[2] = Empleado.checarHoras();
+
+                            System.out.println("Puesto: ");
+                            scanner.nextLine();
+
+                            // Verificar que el puesto ingresado exista.
+                            Puesto puesto = Puesto.checarExistenciaPuesto();
+
+                            // Agregar el nuevo empleado al registro.
+                            Empleado.registrarEmpleado(new Empleado(id, datos[0], datos[1], datos[2],
+                                    datosNumericos[0], datosNumericos[1], datosNumericos[2], puesto));
+
+                            System.out.println("¡Registro exitoso!");
                         } else {
                             break;
                         }
                     } while (true);
-
-                    // Registro de nombre, apellido, domicilio, edad, etc.
-                    String[] datos = new String[3];
-                    int [] datosNumericos = new int[3];
-
-                    System.out.println("Nombre: ");
-                    scanner.nextLine();
-                    datos[0] = scanner.nextLine();
-
-                    System.out.println("Apellido: ");
-                    datos[1] = scanner.nextLine();
-
-                    System.out.println("Domicilio: ");
-                    datos[2] = scanner.nextLine();
-
-                    System.out.println("Edad: ");
-                    datosNumericos[0] = scanner.nextInt();
-
-                    System.out.println("Dias de trabajo: ");
-                    datosNumericos[1] = Empleado.checarDias();
-
-                    System.out.println("Horas extra: ");
-                    datosNumericos[2] = Empleado.checarHoras();
-
-                    System.out.println("Puesto: ");
-                    scanner.nextLine();
-
-                    // Verificar que el puesto ingresado exista.
-                    Puesto puesto = Puesto.checarExistenciaPuesto();
-
-                    // Agregar el nuevo empleado al registro.
-                    Empleado.registrarEmpleado(new Empleado(id, datos[0], datos[1], datos[2],
-                            datosNumericos[0], datosNumericos[1], datosNumericos[2], puesto));
-
-                    System.out.println("¡Registro exitoso!");
                 }
                 case 2 -> {
                     // Dar de baja a un empleado
@@ -216,17 +247,23 @@ public class Empresa implements Nomina {
                 }
                 case 4 -> {
                     // Registrar dias de trabajo
-                    int opcionDias;
+                    int op;
                     /*
                      * Desplegar menu para que el usuario seleccione si registrar los dias trabajados de un empleado
                      * o de todos los empleados.
                      */
                     do {
                         Menu.menuDeOpciones();
-                        opcionDias = scanner.nextInt();
+                        try {
+                            op = scanner.nextInt();
+                        } catch (InputMismatchException e) {
+                            System.out.println("Opcion invalida. Solo se permiten caracteres numericos.");
+                            scanner.nextLine();
+                            continue;
+                        }
 
                         // Empleado
-                        if (opcionDias == 1) {
+                        if (op == 1) {
                             System.out.println("Ingrese el ID del empleado: ");
                             Empleado empleado = Empleado.checarExistenciaEmpleado();
 
@@ -238,17 +275,21 @@ public class Empresa implements Nomina {
                             empleado.registrarDiasLaboradosEmpleado();
 
                         // Todos los empleados
-                        } else if (opcionDias == 2) {
+                        } else if (op == 2) {
                             System.out.println("Ingrese la cantidad de horas laboradas: ");
 
                             // Registrar dias trabajados por todos los empleados
                             Empleado.registrarDiasLaborados();
                         }
-                    } while (opcionDias != 3);
+
+                        if (op == 3) {
+                            break;
+                        }
+                    } while (true);
                 }
                 case 5 -> {
                     // Registrar horas extra
-                    int opcionHorasExtra;
+                    int op;
 
                     /*
                      * Desplegar menu para que el usuario indique si registrar las horas extra de un empleado en
@@ -256,10 +297,16 @@ public class Empresa implements Nomina {
                      */
                     do {
                         Menu.menuDeOpciones();
-                        opcionHorasExtra = scanner.nextInt();
+                        try {
+                            op = scanner.nextInt();
+                        } catch (InputMismatchException e) {
+                            System.out.println("Opcion invalida. Solo se permiten caracteres numericos.");
+                            scanner.nextLine();
+                            continue;
+                        }
 
                         // Empleado
-                        if (opcionHorasExtra == 1) {
+                        if (op == 1) {
                             System.out.println("Ingrese el ID del empleado: ");
                             Empleado empleado = Empleado.checarExistenciaEmpleado();
 
@@ -270,71 +317,111 @@ public class Empresa implements Nomina {
                             empleado.registrarHorasExtraEmpleado();
 
                         // Todos los empleados
-                        } else if (opcionHorasExtra == 2) {
+                        } else if (op == 2) {
                             System.out.println("Ingrese la cantidad de horas extra: ");
 
                             // Registrar horas extra de todos los empleados
                             Empleado.registrarHorasExtra();
                         }
 
-                    } while (opcionHorasExtra != 3);
+                        if (op == 3) {
+                            break;
+                        }
+                    } while (true);
                 }
                 case 6 -> {
-                    // Registrar un nuevo puesto
-                    System.out.println("Por favor, ingrese la informacion que se solicita.");
-
-                    // Verificar que el ID del nuevo puesto no corresponda al de uno ya registrado
-                    int idPuesto = Puesto.checarPuestoPorID();
-                    scanner.nextLine();
-
-                    // Verificar que el nombre del nuevo puesto no corresponda al de uno ya registrado
-                    System.out.println("Nombre: ");
-                    String nombrePuesto;
-                    Puesto nuevoPuesto;
+                    int op;
                     do {
-                        nombrePuesto = scanner.nextLine();
-                        nuevoPuesto = Puesto.buscarPuestoPorNombre(nombrePuesto);
+                        Menu.menuRegistro();
+                        try {
+                            op = scanner.nextInt();
+                        } catch (InputMismatchException e) {
+                            System.out.println("Opcion invalida. Solo se permiten caracteres numericos.");
+                            scanner.nextLine();
+                            continue;
+                        }
 
-                        if (nuevoPuesto != null) {
-                            System.out.println("El puesto ingresado ya existe. Por favor, ingrese un nombre valido.");
+                        if(op == 1) {
+                            Puesto.verRegistroDePuestos();
+                        } else if (op == 2) {
+                            // Registrar un nuevo puesto
+                            System.out.println("Por favor, ingrese la informacion que se solicita.");
+
+                            // Verificar que el ID del nuevo puesto no corresponda al de uno ya registrado
+                            int idPuesto = Puesto.checarPuestoPorID();
+                            scanner.nextLine();
+
+                            // Verificar que el nombre del nuevo puesto no corresponda al de uno ya registrado
+                            System.out.println("Nombre: ");
+                            String nombrePuesto;
+                            Puesto nuevoPuesto;
+                            do {
+                                nombrePuesto = scanner.nextLine();
+                                nuevoPuesto = Puesto.buscarPuestoPorNombre(nombrePuesto);
+
+                                if (nuevoPuesto != null) {
+                                    System.out.println("El puesto ingresado ya existe. Por favor, ingrese un nombre valido.");
+                                } else {
+                                    break;
+                                }
+                            } while (true);
+
+                            // Registro de salario por dia y por hora extra de acuerdo al puesto.
+                            System.out.println("Salario por dia: ");
+                            double salarioPorDia;
+                            try {
+                                salarioPorDia = scanner.nextDouble();
+                            } catch (InputMismatchException e) {
+                                System.out.println("Por favor, ingrese una cantidad valida.");
+                                scanner.nextLine();
+                                continue;
+                            }
+
+                            System.out.println("Salario por hora extra: ");
+                            double salarioPorHoraExtra;
+                            try {
+                                salarioPorHoraExtra = scanner.nextDouble();
+                            } catch (InputMismatchException e) {
+                                System.out.println("Por favor, ingrese una cantidad valida.");
+                                scanner.nextLine();
+                                continue;
+                            }
+
+                            // Agregar el nuevo puesto al registro
+                            Puesto.getRegistroDePuestos().add(new Puesto(idPuesto, nombrePuesto, salarioPorDia,
+                                    salarioPorHoraExtra));
+                            System.out.println("¡Registro exitoso!");
                         } else {
                             break;
                         }
                     } while (true);
-
-
-                    // Registro de salario por dia y por hora extra de acuerdo al puesto.
-                    System.out.println("Salario por dia: ");
-                    double salarioPorDia = scanner.nextDouble();
-
-                    System.out.println("Salario por hora extra: ");
-                    double salarioPorHoraExtra = scanner.nextDouble();
-
-                    // Agregar el nuevo puesto al registro
-                    Puesto.getRegistroDePuestos().add(new Puesto(idPuesto, nombrePuesto, salarioPorDia,
-                            salarioPorHoraExtra));
-                    System.out.println("¡Registro exitoso!");
                 }
                 case 7 -> {
                     // Calcular nomina
-                    int opcionNomina;
+                    int op;
                     /*
                      * Desplegar menu para que el usuario indique si calcular la nomina de un empleado en particular
                      * o de toda la empresa
                      */
                     do {
                         Menu.menuDeOpciones();
-                        opcionNomina = scanner.nextInt();
+                        try {
+                            op = scanner.nextInt();
+                        } catch (InputMismatchException e) {
+                            System.out.println("Opcion invalida. solo se permiten caracteres numericos.");
+                            scanner.nextLine();
+                            continue;
+                        }
 
                         // Empleado
-                        if (opcionNomina == 1) {
+                        if (op == 1) {
                             System.out.println("Ingrese el ID del empleado: ");
 
                             // Mostrar en pantalla la nomina del empleado
                             empresa.calcularNominaEmpleado();
 
                         // Empresa
-                        } else if (opcionNomina == 2) {
+                        } else if (op == 2) {
                             // Calcular nomina de la empresa
                             empresa.calcularNominaEmpresa();
                             System.out.println("¡Calculo exitoso!");
@@ -344,7 +431,11 @@ public class Empresa implements Nomina {
                             System.out.println("Nomina almacenada. Para visualizarla en el historial, por favor, " +
                                     "regrese al menu principal y seleccione la opcion correspondiente.");
                         }
-                    } while (opcionNomina != 3);
+
+                        if (op == 3)  {
+                            break;
+                        }
+                    } while (true);
 
                 }
                 case 8 -> {
@@ -356,6 +447,10 @@ public class Empresa implements Nomina {
                 }
                 default -> System.out.println("¡Hasta luego!");
             }
-        } while (opcion != 9);
+
+            if (opcion == 9) {
+                break;
+            }
+        } while (true);
     }
 }
