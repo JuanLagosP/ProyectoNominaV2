@@ -115,7 +115,7 @@ public class Puesto {
         do {
             puesto = buscarPuestoPorNombre(new Scanner(System.in).nextLine());
             if (puesto == null) {
-                System.out.println("El puesto ingresado no existe. Por favor, ingrese un puesto valido.");
+                System.out.println("El puesto ingresado no existe. Por favor, ingrese un puesto valido: ");
             }
         } while (puesto == null);
 
@@ -123,13 +123,12 @@ public class Puesto {
     }
 
     public static int checarPuestoPorID() {
-        System.out.println("ID: ");
-
         int idPuesto;
         Puesto puesto;
 
         do {
             try {
+                System.out.println("ID: ");
                 idPuesto = new Scanner(System.in).nextInt();
             } catch (InputMismatchException e) {
                 System.out.println("Solo se permiten caracteres numericos.");
@@ -139,7 +138,7 @@ public class Puesto {
             puesto = buscarPuestoPorID(idPuesto);
 
             if (puesto != null) {
-                System.out.println("El ID ingresado ya pertenece a un puesto. Por favor, ingrese un nuevo ID");
+                System.out.println("El ID ingresado ya pertenece a un puesto. Por favor, ingrese un nuevo ID: ");
             } else {
                 return idPuesto;
             }

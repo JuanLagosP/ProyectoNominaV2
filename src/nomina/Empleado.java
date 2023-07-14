@@ -108,8 +108,9 @@ public class Empleado extends Persona {
     public static void actualizarDatos(Empleado empleado) {
         int opcion;
         do {
-            Menu.menuActualizacionDeDatos();
+            new Menu().menuActualizacionDeDatos();
             try {
+                System.out.println("Ingrese la opcion deseada: ");
                 opcion = new Scanner(System.in).nextInt();
             } catch (InputMismatchException e) {
                 System.out.println("Opcion invalida. Solo se permiten caracteres numericos.");
@@ -134,8 +135,17 @@ public class Empleado extends Persona {
                 }
                 case 3 -> {
                     // Actualizar edad
-                    System.out.println("Ingrese la nueva edad: ");
-                    empleado.setEdad(new Scanner(System.in).nextInt());
+                    do {
+                        try {
+                            System.out.println("Ingrese la nueva edad: ");
+                            empleado.setEdad(new Scanner(System.in).nextInt());
+                            break;
+                        } catch (InputMismatchException e) {
+                            System.out.println("Error: solo se permiten caracteres numericos." +
+                                    "Por favor, intente de nuevo.");
+                        }
+                    } while (true);
+
                     System.out.println("Actualizacion exitosa. Edad: " +
                             empleado.getEdad());
                 }
@@ -151,6 +161,7 @@ public class Empleado extends Persona {
         int dias;
         do {
             try {
+                System.out.println("Dias laborados: ");
                 dias = new Scanner(System.in).nextInt();
             } catch (InputMismatchException e) {
                 System.out.println("Solo se permiten caracteres numericos.");
@@ -173,6 +184,7 @@ public class Empleado extends Persona {
         int dias;
         do {
             try {
+                System.out.println("Dias laborados: ");
                 dias = new Scanner(System.in).nextInt();
             } catch (InputMismatchException e) {
                 System.out.println("Solo se permiten caracteres numericos.");
@@ -197,6 +209,7 @@ public class Empleado extends Persona {
         int horas;
         do {
             try {
+                System.out.println("Horas extra: ");
                 horas = new Scanner(System.in).nextInt();
             } catch (InputMismatchException e) {
                 System.out.println("Solo se permiten caracteres numericos.");
@@ -208,9 +221,10 @@ public class Empleado extends Persona {
                 System.out.println("¡Registro exitoso!");
                 break;
             } else if (horas > 40) {
-                System.out.println("Alerta: no se permite mas de 40 horas extra al mes.");
+                System.out.println("Alerta: no se permiten mas de 40 horas extra al mes.");
+                System.out.println("Por favor, ingrese una cantidad valida: ");
             } else {
-                System.out.println("Por favor, ingrese una cantidad valida.");
+                System.out.println("Por favor, ingrese una cantidad valida:");
             }
         } while (true);
     }
@@ -219,6 +233,7 @@ public class Empleado extends Persona {
         int horas;
         do {
             try {
+                System.out.println("Horas extra: ");
                 horas = new Scanner(System.in).nextInt();
             } catch (InputMismatchException e) {
                 System.out.println("Solo se permiten caracteres numericos.");
@@ -233,8 +248,9 @@ public class Empleado extends Persona {
                 break;
             } else if (horas > 40) {
                 System.out.println("Alerta: no se permite mas de 40 horas extra al mes.");
+                System.out.println("Por favor, ingrese una cantidad valida: ");
             } else {
-                System.out.println("Por favor, ingrese una cantidad valida.");
+                System.out.println("Por favor, ingrese una cantidad valida: ");
             }
         } while (true);
     }
@@ -258,7 +274,7 @@ public class Empleado extends Persona {
                 continue;
             }
             if (empleado == null) {
-                System.out.println("Empleado no encontrado. Por favor, ingrese un ID valido.");
+                System.out.println("Empleado no encontrado. Por favor, ingrese un ID valido: ");
             } else {
                 break;
             }
@@ -271,6 +287,7 @@ public class Empleado extends Persona {
         int dias;
         do {
             try {
+                System.out.println("Dias de trabajo:");
                 dias = new Scanner(System.in).nextInt();
             } catch (InputMismatchException e) {
                 System.out.println("Solo se permiten caracteres numericos.");
@@ -289,6 +306,7 @@ public class Empleado extends Persona {
         int horas;
         do {
             try {
+                System.out.println("Horas extra: ");
                 horas = new Scanner(System.in).nextInt();
             } catch (InputMismatchException e) {
                 System.out.println("Solo se permiten caracteres numericos.");

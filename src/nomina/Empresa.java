@@ -1,9 +1,6 @@
 package nomina;
 
-import java.util.InputMismatchException;
-import java.util.Scanner;
-import java.util.Map;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 public class Empresa implements Nomina {
     // Atributos
@@ -97,6 +94,40 @@ public class Empresa implements Nomina {
         }
     }
 
+    @Override
+    public void verHistorialOrdenAlfabetico() {
+        Comparator<Map.Entry<String, double[]>> comparator = (mes1, mes2) -> mes1.getKey().compareTo(mes2.getKey());
+        historialDeNomina.entrySet().stream().sorted(comparator).forEach(entry -> {System.out.println(
+                entry.getKey() + " - Nomina base: " + entry.getValue()[0] + "- Horas extra: " + entry.getValue()[1]
+                + " - Nomina total: " + entry.getValue()[2]
+        );
+        });
+    }
+
+    @Override
+    public void verHistorialMayorNomina() {
+        Comparator<Map.Entry<String, double[]>> comparator = (nom1, nom2) -> -Double.compare(nom1.getValue()[2], nom2.getValue()[2]);
+        historialDeNomina.entrySet().stream().sorted(comparator).forEach(entry -> {
+            System.out.println(
+                    entry.getKey() + " - Nomina base: " + entry.getValue()[0] + "- Horas extra: " + entry.getValue()[1]
+                            + " - Nomina total: " + entry.getValue()[2]
+            );
+
+        });
+    }
+
+    @Override
+    public void verHistorialMenorNomina() {
+        Comparator<Map.Entry<String, double[]>> comparator = (nom1, nom2) -> Double.compare(nom1.getValue()[2], nom2.getValue()[2]);
+        historialDeNomina.entrySet().stream().sorted(comparator).forEach(entry -> {
+            System.out.println(
+                    entry.getKey() + " - Nomina base: " + entry.getValue()[0] + "- Horas extra: " + entry.getValue()[1]
+                            + " - Nomina total: " + entry.getValue()[2]
+            );
+
+        });
+    }
+
     public Empresa() {
     }
 
@@ -104,6 +135,7 @@ public class Empresa implements Nomina {
 
         Scanner scanner = new Scanner(System.in);
         Empresa empresa = new Empresa();
+        Menu menu = new Menu();
 
         Empleado.inicializarRegistroDeEmpleados();
         Puesto.inicializarRegistroDePuestos();
@@ -132,7 +164,7 @@ public class Empresa implements Nomina {
         int opcion;
 
         do {
-            Menu.menuPrincipal();
+            menu.menuPrincipal();
             try {
                 opcion = scanner.nextInt();
             } catch (InputMismatchException e) {
@@ -145,8 +177,9 @@ public class Empresa implements Nomina {
                 case 1 -> {
                     int op;
                     do {
-                        Menu.menuRegistro();
+                        menu.menuRegistro();
                         try {
+                            System.out.println("Ingrese la opcion deseada: ");
                             op = scanner.nextInt();
                         } catch (InputMismatchException e) {
                             System.out.println("Opcion ivalida. Solo se permiten caracteres numericos.");
@@ -159,12 +192,12 @@ public class Empresa implements Nomina {
                         } else if (op == 2) {
                             // Registro de un nuevo empleado
                             System.out.println("Por favor, ingrese la informacion que se solicita.");
-                            System.out.println("ID: ");
                             int id;
                             Empleado empleado;
                             // Verificar que el ID ingresado no corresponda al de un empleado ya registrado.
                             do {
                                 try {
+                                    System.out.println("ID: ");
                                     id = scanner.nextInt();
                                 } catch (InputMismatchException e) {
                                     System.out.println("Solo se permiten caracteres numericos.");
@@ -195,16 +228,27 @@ public class Empresa implements Nomina {
                             System.out.println("Domicilio: ");
                             datos[2] = scanner.nextLine();
 
-                            System.out.println("Edad: ");
-                            datosNumericos[0] = scanner.nextInt();
+                            do {
+                                try {
+                                    System.out.println("Edad: ");
+                                    datosNumericos[0] = scanner.nextInt();
+                                    break;
+                                } catch (InputMismatchException e) {
+                                    System.out.println("Solo se permiten caracteres numericos." +
+                                            "Por favor, intente de nuevo.");
+                                    scanner.nextLine();
+                                }
+                            } while (true);
 
-                            System.out.println("Dias de trabajo: ");
                             datosNumericos[1] = Empleado.checarDias();
 
-                            System.out.println("Horas extra: ");
                             datosNumericos[2] = Empleado.checarHoras();
 
-                            System.out.println("Puesto: ");
+                            System.out.println("----- Puestos disponibles -----");
+                            for (Puesto p : Puesto.getRegistroDePuestos()) {
+                                System.out.println("-" + p.getNombrePuesto());
+                            }
+                            System.out.println("Por favor, ingrese el puesto deseado: ");
                             scanner.nextLine();
 
                             // Verificar que el puesto ingresado exista.
@@ -253,7 +297,7 @@ public class Empresa implements Nomina {
                      * o de todos los empleados.
                      */
                     do {
-                        Menu.menuDeOpciones();
+                        menu.menuDeOpciones();
                         try {
                             op = scanner.nextInt();
                         } catch (InputMismatchException e) {
@@ -296,7 +340,7 @@ public class Empresa implements Nomina {
                      * particular o de todos los empleados
                      */
                     do {
-                        Menu.menuDeOpciones();
+                        menu.menuDeOpciones();
                         try {
                             op = scanner.nextInt();
                         } catch (InputMismatchException e) {
@@ -332,7 +376,7 @@ public class Empresa implements Nomina {
                 case 6 -> {
                     int op;
                     do {
-                        Menu.menuRegistro();
+                        menu.menuRegistro();
                         try {
                             op = scanner.nextInt();
                         } catch (InputMismatchException e) {
@@ -404,7 +448,7 @@ public class Empresa implements Nomina {
                      * o de toda la empresa
                      */
                     do {
-                        Menu.menuDeOpciones();
+                        menu.menuDeOpciones();
                         try {
                             op = scanner.nextInt();
                         } catch (InputMismatchException e) {
@@ -440,10 +484,42 @@ public class Empresa implements Nomina {
                 }
                 case 8 -> {
                     // Visualizar historial de nomina en pantalla
-                    System.out.println("----- Historial de nomina -----");
-                    empresa.verHistorialDeNomina();
-                    System.out.println("-------------------------------");
-                    System.out.println();
+                    int op;
+                    do {
+                        menu.menuHistorial();
+                        try {
+                            op = scanner.nextInt();
+                        } catch (InputMismatchException e) {
+                            System.out.println("Opcion invalida. Por favor, intente de nuevo. ");
+                            scanner.nextLine();
+                            continue;
+                        }
+
+                        switch (op) {
+                            case 1 -> {
+                                System.out.println("----- Historial de Nomina -----");
+                                empresa.verHistorialDeNomina();
+                            }
+                            case 2 -> {
+                                System.out.println("----- Historial de Nomina en Orden Alfabetico -----");
+                                empresa.verHistorialOrdenAlfabetico();
+                            }
+                            case 3 -> {
+                                System.out.println("----- Historial de Nomina de Menor a Mayor Total-----");
+                                empresa.verHistorialMenorNomina();
+                            }
+                            case 4 -> {
+                                System.out.println("----- Historial de Nomina de Mayor a Menor Total-----");
+                                empresa.verHistorialMayorNomina();
+                            }
+                            default -> {
+                            }
+                        }
+
+                        if (op == 5) {
+                            break;
+                        }
+                    } while (true);
                 }
                 default -> System.out.println("¡Hasta luego!");
             }
